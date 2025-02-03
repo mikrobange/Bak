@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR;
 public class PlayerInputHandler : MonoBehaviour
 {
    [Header("Input Action Asset")]
@@ -17,15 +18,20 @@ public class PlayerInputHandler : MonoBehaviour
    [SerializeField] private string move = "Move";
    [SerializeField] private string dash = "Dash";
    [SerializeField] private string interact = "Interact";
-
+   [SerializeField] private string meleeAttack = "MeleeAttack";
+   [SerializeField] private string meleeSpecialAttack = "MeleeSpecialAttack";
    private InputAction moveAction;
    private InputAction dashAction;
    private InputAction interactAction;
+   private InputAction meleeAttackAction;
+   private InputAction meleeSpecialAttackAction;
 
    public Vector2 MoveInput { get; private set; }
    public bool dashTriggered { get; private set; }
    public bool interactTriggered { get; private set; }
 
+   public static event Action meleeAttackTriggered;
+   public static event Action meleeSpecialAttackTriggered;
    public static PlayerInputHandler Instance { get; private set; }
 
    private void Awake()
@@ -45,6 +51,8 @@ public class PlayerInputHandler : MonoBehaviour
       moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
       dashAction = playerControls.FindActionMap(actionMapName).FindAction(dash);
       interactAction = playerControls.FindActionMap(actionMapName).FindAction(interact);
+      meleeAttackAction = playerControls.FindActionMap(actionMapName).FindAction(meleeAttack);
+      meleeSpecialAttackAction = playerControls.FindActionMap(actionMapName).FindAction(meleeSpecialAttack);
       RegisterInputActions();
    }
    void RegisterInputActions()
@@ -57,6 +65,19 @@ public class PlayerInputHandler : MonoBehaviour
 
       interactAction.performed += context => interactTriggered = true;
       interactAction.canceled += context => interactTriggered = false;
+
+      meleeAttackAction.performed += HandleMeleeAttack;
+
+      meleeSpecialAttackAction.performed += HandleMeleeSpecialAttack;
+   }
+
+   private void HandleMeleeAttack(InputAction.CallbackContext context)
+   {
+      meleeAttackTriggered?.Invoke();
+   }
+   private void HandleMeleeSpecialAttack(InputAction.CallbackContext context)
+   {
+      meleeSpecialAttackTriggered?.Invoke();
    }
    private void OnEnable()
    {
@@ -64,6 +85,8 @@ public class PlayerInputHandler : MonoBehaviour
       moveAction.Enable();
       dashAction.Enable();
       interactAction.Enable();
+      meleeAttackAction.Enable();
+      meleeSpecialAttackAction.Enable();
    }
    private void OnDisable()
    {
@@ -71,5 +94,8 @@ public class PlayerInputHandler : MonoBehaviour
       moveAction.Disable();
       dashAction.Disable();
       interactAction.Disable();
+      meleeAttackAction.Disable();
+      meleeSpecialAttackAction.Disable();
+
    }
 }
