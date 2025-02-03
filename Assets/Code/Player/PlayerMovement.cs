@@ -9,10 +9,12 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private PlayerInputHandler inputHandler;
     private float horizontalInput = 0;
+    private Animator animator;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         inputHandler = PlayerInputHandler.Instance;
+        animator = GetComponentInChildren<Animator>();
     }
     private void Update()
     {
@@ -29,16 +31,17 @@ public class PlayerMovement : MonoBehaviour
     void ApplyMovement()
     {
         float speed = moveSpeed;
+        animator.SetFloat("Velocity", Mathf.Abs(horizontalInput));
         rb.velocity = inputHandler.MoveInput * speed;
     }
     private void FlipSprite(float horizontalMovement)
     {
 
-        if (horizontalMovement < 0)
+        if (horizontalMovement > 0)
         {
             transform.localScale = new Vector3(1, 1, 1);
         }
-        else if (horizontalMovement > 0)
+        else if (horizontalMovement < 0)
         {
             transform.localScale = new Vector3(-1, 1, 1);
         }
